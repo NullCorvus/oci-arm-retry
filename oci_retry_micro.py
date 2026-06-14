@@ -15,6 +15,7 @@ COMPARTMENT_ID = (
     "ocid1.tenancy.oc1..aaaaaaaaaqij5zlnm3v5qprvdll3j7nc6o3dk4ykzerugzxe37ckajkpjxpa"  # Replace with your tenancy OCID
 )
 SSH_PUBLIC_KEY = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxPqVeut2vbwt8VVAvHDnEN+q61jrIAGD9cQgW6kTeLCjjzm9UHt2Flf1KoohSu+0YFvSn8+t67r9T9wfdP14WBfZAg531CCyUNTbF5KmkaHgmxftWu3FgY00BTnGa4YEEXdAGn3X953HzFKJDpJVJyWFfWXJUOWdfivTKlO+62SBnlIdcanckwA6rzr9dXNSYlasoVnuk+ujANjhnxf4TpKcI4AQrAmRJQ83lXfI2yExBMX+Qx/JNSA2/2XFRfT7OMgddExibCRpSyammfatNLUIM5s+ab6aeO3aNvVWGok6/dpYaBPbvndERQs6p9FQr88C/VFeEwHCtvMT8c2WB ssh-key-2026-03-07"  # Replace with your SSH public key (.pub file content)
+INSTANCE_NAME  = "micro-server"  # Change for each new instance (e.g. "micro-server-2" for a second one)
 RETRY_INTERVAL = 90  # seconds
 # ────────────────────────────────────────────────────────
 
@@ -141,7 +142,7 @@ def try_create_instance(subnet_id, ad_name, image_id):
     instance = compute.launch_instance(
         oci.core.models.LaunchInstanceDetails(
             compartment_id=COMPARTMENT_ID,
-            display_name="micro-server",
+            display_name=INSTANCE_NAME,
             availability_domain=ad_name,
             shape="VM.Standard.E2.1.Micro",
             source_details=oci.core.models.InstanceSourceViaImageDetails(

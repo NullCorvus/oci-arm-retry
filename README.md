@@ -38,8 +38,11 @@ Open the script and edit the variables at the top:
 ```python
 COMPARTMENT_ID = "ocid1.tenancy.oc1..your-ocid"
 SSH_PUBLIC_KEY = "ssh-rsa AAAA...your-public-key"
+INSTANCE_NAME  = "micro-server"   # Change to "micro-server-2" when claiming your second Micro instance
 RETRY_INTERVAL = 90  # Retry interval in seconds
 ```
+
+> Each OCI account can have up to **2 free Micro instances**. To claim a second one, change `INSTANCE_NAME` to a different value (e.g. `"micro-server-2"`) so both instances can be identified separately in the OCI Console. The VCN and subnet are shared between instances automatically.
 
 ### Get Compartment ID (Tenancy OCID)
 
@@ -244,13 +247,16 @@ ssh -i private-key.pem ubuntu@your-public-ip
 
 ## 腳本設定
 
-開啟腳本，修改最上方的兩個變數：
+開啟腳本，修改最上方的變數：
 
 ```python
 COMPARTMENT_ID = "ocid1.tenancy.oc1..你的OCID"
 SSH_PUBLIC_KEY = "ssh-rsa AAAA...你的公開金鑰內容"
+INSTANCE_NAME  = "micro-server"   # 搶第二台時改成 "micro-server-2"，方便在 OCI Console 區分
 RETRY_INTERVAL = 90  # 重試間隔（秒）
 ```
+
+> 每個 OCI 帳號最多可以有 **2 台免費 Micro**。搶第二台時，將 `INSTANCE_NAME` 改成不同的名稱（例如 `"micro-server-2"`），方便在 OCI Console 區分。VCN 和子網路會自動共用，不需要另外建立。
 
 ### 取得 Compartment ID（租用戶 OCID）
 
