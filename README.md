@@ -13,10 +13,13 @@ Automated retry scripts to claim Oracle Cloud Always Free VMs (ARM A1.Flex / x86
 
 | Script | Instance Type | Spec | Architecture |
 |--------|--------------|------|--------------|
-| `oci_retry.py` | VM.Standard.A1.Flex | 4 OCPU / 24 GB RAM / 200 GB disk | ARM (Ampere) |
+| `oci_retry.py` | VM.Standard.A1.Flex | 2 OCPU / 12 GB RAM / 100 GB disk | ARM (Ampere) |
 | `oci_retry_micro.py` | VM.Standard.E2.1.Micro | 1 OCPU / 1 GB RAM / 50 GB disk | x86 |
 
-Both are part of the Oracle Always Free tier. Each account can have up to 4 ARM OCPUs (can be split across multiple instances) + 2 Micro instances.
+Both are part of the Oracle Always Free tier. As of June 15, 2026, Oracle documents Always Free Ampere A1 as a total of 2 OCPUs + 12 GB memory per tenancy, while Micro remains available for up to 2 instances.
+
+> 📌 **Always Free update (June 15, 2026):** Oracle's official Always Free page now documents Ampere A1 as **2 OCPUs + 12 GB RAM** per tenancy, and free boot volume + block volume storage as **200 GB total per region**.  
+> Official source: https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm
 
 ---
 
@@ -35,10 +38,27 @@ Both are part of the Oracle Always Free tier. Each account can have up to 4 ARM 
 
 Open the script and edit the variables at the top:
 
+### ARM script: `oci_retry.py`
+
+```python
+COMPARTMENT_ID = "ocid1.tenancy.oc1..your-ocid"
+SSH_PUBLIC_KEY = "ssh-rsa AAAA...your-public-key"
+INSTANCE_NAME = "streamlit-server"
+ARM_OCPUS = 2
+ARM_MEMORY_IN_GBS = 12
+BOOT_VOLUME_SIZE_IN_GBS = 100
+RETRY_INTERVAL = 90  # Retry interval in seconds
+```
+
+> The ARM script now exposes `BOOT_VOLUME_SIZE_IN_GBS` as a configuration variable. The default is `100 GB`, which is safer under the Always Free `200 GB` regional storage quota than the old `200 GB` default.
+
+### Micro script: `oci_retry_micro.py`
+
 ```python
 COMPARTMENT_ID = "ocid1.tenancy.oc1..your-ocid"
 SSH_PUBLIC_KEY = "ssh-rsa AAAA...your-public-key"
 INSTANCE_NAME  = "micro-server"   # Change to "micro-server-2" when claiming your second Micro instance
+BOOT_VOLUME_SIZE_IN_GBS = 50
 RETRY_INTERVAL = 90  # Retry interval in seconds
 ```
 
@@ -227,10 +247,13 @@ ssh -i private-key.pem ubuntu@your-public-ip
 
 | 腳本 | 目標機型 | 規格 | 架構 |
 |------|---------|------|------|
-| `oci_retry.py` | VM.Standard.A1.Flex | 4 OCPU / 24 GB RAM / 200 GB 磁碟 | ARM (Ampere) |
+| `oci_retry.py` | VM.Standard.A1.Flex | 2 OCPU / 12 GB RAM / 100 GB 磁碟 | ARM (Ampere) |
 | `oci_retry_micro.py` | VM.Standard.E2.1.Micro | 1 OCPU / 1 GB RAM / 50 GB 磁碟 | x86 |
 
-兩種都是 Oracle Always Free 永久免費方案。每帳號最多 4 OCPU ARM（可拆成多台）+ 2 台 Micro。
+兩種都是 Oracle Always Free 永久免費方案。從 `2026-06-15` 起，Oracle 官方文件已將 Always Free Ampere A1 配額更新為每個 tenancy 總共 `2 OCPU + 12 GB RAM`，Micro 則仍可最多建立 2 台。
+
+> 📌 **官方更新（2026-06-15 起）：** Oracle 官方 Always Free 頁面現在明確寫明 Ampere A1 為每個 tenancy **2 OCPU + 12 GB RAM**，而免費的 boot volume + block volume 儲存總額則是 **每個 region 共 200 GB**。  
+> 官方來源：https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm
 
 ---
 
@@ -249,10 +272,27 @@ ssh -i private-key.pem ubuntu@your-public-ip
 
 開啟腳本，修改最上方的變數：
 
+### ARM 腳本：`oci_retry.py`
+
+```python
+COMPARTMENT_ID = "ocid1.tenancy.oc1..你的OCID"
+SSH_PUBLIC_KEY = "ssh-rsa AAAA...你的公開金鑰內容"
+INSTANCE_NAME = "streamlit-server"
+ARM_OCPUS = 2
+ARM_MEMORY_IN_GBS = 12
+BOOT_VOLUME_SIZE_IN_GBS = 100
+RETRY_INTERVAL = 90  # 重試間隔（秒）
+```
+
+> ARM 腳本現在把 `BOOT_VOLUME_SIZE_IN_GBS` 抽成可調整的設定變數，預設為 `100 GB`。這比舊版 `200 GB` 更安全，較不容易一次把 Always Free 的 `200 GB` 區域儲存額度吃滿。
+
+### Micro 腳本：`oci_retry_micro.py`
+
 ```python
 COMPARTMENT_ID = "ocid1.tenancy.oc1..你的OCID"
 SSH_PUBLIC_KEY = "ssh-rsa AAAA...你的公開金鑰內容"
 INSTANCE_NAME  = "micro-server"   # 搶第二台時改成 "micro-server-2"，方便在 OCI Console 區分
+BOOT_VOLUME_SIZE_IN_GBS = 50
 RETRY_INTERVAL = 90  # 重試間隔（秒）
 ```
 

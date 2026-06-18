@@ -4,9 +4,9 @@ import datetime
 
 # ╔══════════════════════════════════════════════════════╗
 # ║  Target : VM.Standard.A1.Flex (ARM)                  ║
-# ║  Spec   : 4 OCPU / 24 GB RAM / 200 GB disk           ║
+# ║  Spec   : 2 OCPU / 12 GB RAM / 100 GB disk (default) ║
 # ║  Arch   : ARM (Ampere)                               ║
-# ║  Tier   : Oracle Always Free (free forever)          ║
+# ║  Tier   : Oracle Always Free                         ║
 # ║  OS     : Canonical Ubuntu 22.04                     ║
 # ╚══════════════════════════════════════════════════════╝
 
@@ -15,6 +15,10 @@ COMPARTMENT_ID = (
     "ocid1.tenancy.oc1..aaaaaaaaaqij5zlnm3v5qprvdll3j7nc6o3dk4ykzerugzxe37ckajkpjxpa"  # Replace with your tenancy OCID
 )
 SSH_PUBLIC_KEY = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDdsLT/y7kupelr7rr+NcIyPVb4ZC20x9L5VuNMC5aYlXmSuqJQemXzdzfvp5F899CNdBe+TJJ+w55ka6C5J8vZTMmT4IfIOKZdJsKaTwOCbYTRz62PLcq90veNBPdn0kcnUxrqD3ReKxkKhyyL9WIWH1+4e945w9TL2wgr7Os0rYN5q/4Sa6ioof1I4NE9lGw+WL2yjOI0YLQXmWnvRb7qcQUdOCxgbOXw3GsPFwp3UZ+yJm8kbwFzJdTojaUeriuk3HQYFjzaOVN07kmf2vTQKSgsyw5B+BhyeYQmcRtNTNiriZ7skfS06/24ZM/hzLBz7/PQgw0DoRHDWB5YbyT1 ssh-key-2026-03-05"  # Replace with your SSH public key (.pub file content)
+INSTANCE_NAME = "streamlit-server"
+ARM_OCPUS = 2
+ARM_MEMORY_IN_GBS = 12
+BOOT_VOLUME_SIZE_IN_GBS = 100
 RETRY_INTERVAL = 90  # seconds
 # ────────────────────────────────────────────────────────
 
@@ -142,16 +146,16 @@ def try_create_instance(subnet_id, ad_name, image_id):
     instance = compute.launch_instance(
         oci.core.models.LaunchInstanceDetails(
             compartment_id=COMPARTMENT_ID,
-            display_name="streamlit-server",
+            display_name=INSTANCE_NAME,
             availability_domain=ad_name,
             shape="VM.Standard.A1.Flex",
             shape_config=oci.core.models.LaunchInstanceShapeConfigDetails(
-                ocpus=4,
-                memory_in_gbs=24,
+                ocpus=ARM_OCPUS,
+                memory_in_gbs=ARM_MEMORY_IN_GBS,
             ),
             source_details=oci.core.models.InstanceSourceViaImageDetails(
                 image_id=image_id,
-                boot_volume_size_in_gbs=200,
+                boot_volume_size_in_gbs=BOOT_VOLUME_SIZE_IN_GBS,
             ),
             create_vnic_details=oci.core.models.CreateVnicDetails(
                 subnet_id=subnet_id,

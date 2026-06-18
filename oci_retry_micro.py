@@ -15,7 +15,8 @@ COMPARTMENT_ID = (
     "ocid1.tenancy.oc1..aaaaaaaaaqij5zlnm3v5qprvdll3j7nc6o3dk4ykzerugzxe37ckajkpjxpa"  # Replace with your tenancy OCID
 )
 SSH_PUBLIC_KEY = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxPqVeut2vbwt8VVAvHDnEN+q61jrIAGD9cQgW6kTeLCjjzm9UHt2Flf1KoohSu+0YFvSn8+t67r9T9wfdP14WBfZAg531CCyUNTbF5KmkaHgmxftWu3FgY00BTnGa4YEEXdAGn3X953HzFKJDpJVJyWFfWXJUOWdfivTKlO+62SBnlIdcanckwA6rzr9dXNSYlasoVnuk+ujANjhnxf4TpKcI4AQrAmRJQ83lXfI2yExBMX+Qx/JNSA2/2XFRfT7OMgddExibCRpSyammfatNLUIM5s+ab6aeO3aNvVWGok6/dpYaBPbvndERQs6p9FQr88C/VFeEwHCtvMT8c2WB ssh-key-2026-03-07"  # Replace with your SSH public key (.pub file content)
-INSTANCE_NAME  = "micro-server"  # Change for each new instance (e.g. "micro-server-2" for a second one)
+INSTANCE_NAME = "micro-server"  # Change for each new instance (e.g. "micro-server-2" for a second one)
+BOOT_VOLUME_SIZE_IN_GBS = 50
 RETRY_INTERVAL = 90  # seconds
 # ────────────────────────────────────────────────────────
 
@@ -53,6 +54,7 @@ def get_ubuntu_x86_image():
 def create_vcn_and_subnet():
     network = oci.core.VirtualNetworkClient(config)
 
+    # Check if VCN already exists
     vcns = network.list_vcns(COMPARTMENT_ID, display_name="retry-vcn-micro").data
     if vcns:
         vcn = vcns[0]
@@ -147,6 +149,7 @@ def try_create_instance(subnet_id, ad_name, image_id):
             shape="VM.Standard.E2.1.Micro",
             source_details=oci.core.models.InstanceSourceViaImageDetails(
                 image_id=image_id,
+                boot_volume_size_in_gbs=BOOT_VOLUME_SIZE_IN_GBS,
             ),
             create_vnic_details=oci.core.models.CreateVnicDetails(
                 subnet_id=subnet_id,
