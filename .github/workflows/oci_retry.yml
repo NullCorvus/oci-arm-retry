@@ -13,6 +13,8 @@ jobs:
     timeout-minutes: 355      # Close to GitHub Actions 6-hour limit
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # Suppress Node.js 20 deprecation warning
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      CHAT_ID: 7682638615
 
     steps:
       - name: Checkout
