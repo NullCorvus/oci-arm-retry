@@ -1,6 +1,7 @@
 import oci
 import time
 import datetime
+import os
 
 # ╔══════════════════════════════════════════════════════╗
 # ║  Target : VM.Standard.A1.Flex (ARM)                  ║
@@ -28,6 +29,21 @@ RETRY_INTERVAL = 90  # seconds
 #   The workflow auto-creates it from GitHub Secrets — see README.md
 # ────────────────────────────────────────────────────────
 config = oci.config.from_file()
+
+
+def send_telegram(message):
+    """Send a Telegram notification using curl."""
+    token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    chat_id = os.environ.get("CHAT_ID")
+    if not token or not chat_id:
+        return  # Skip silently if not configured
+    try:
+        import urllib.parse
+        encoded_msg = urllib.parse.quote(message)
+        url = f"https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={encoded_msg}"
+        os.system(f"curl -s '{url}' > /dev/null 2>&1")
+    except Exception:
+        pass  # Silently ignore errors
 
 
 def get_availability_domain():
@@ -177,6 +193,8 @@ def main():
     image_id = get_ubuntu_arm_image()
     print(f"Image ID: {image_id}")
 
+    send_telegram("🔄 Retry Started - Monitoring for A1.Flex Capacity in sa-bogota-1")
+
     attempt = 0
     while True:
         attempt += 1
@@ -189,6 +207,7 @@ def main():
             print(f"   ID: {instance.id}")
             print(f"   State: {instance.lifecycle_state}")
             print(f"   Check Oracle Cloud Console for the public IP")
+            send_telegram(f"✅ A1.Flex VM Created! Name: {INSTANCE_NAME}, Region: sa-bogota-1")
             break
         except oci.exceptions.ServiceError as e:
             if "Out of host capacity" in str(e) or "capacity" in str(e).lower():
